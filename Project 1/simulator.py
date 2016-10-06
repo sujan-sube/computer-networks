@@ -1,5 +1,6 @@
 import numpy as np
 from asyncio import Queue
+from matplotlib import pyplot as p
 
 # set global variables (tick duration set to 1 ms)
 TICK_DURATION = 10**-3
@@ -34,9 +35,9 @@ def md1(action, q, i, service_tick):
         service_tick = i + SERVICE_TIME
 
       if i == service_tick:
-        service_tick = i + SERVICE_TIME
+        # service_tick = i + SERVICE_TIME
         global AVG_SOJOURN_TICK
-        AVG_SOJOURN_TICK += i - q.get_nowait()
+        AVG_SOJOURN_TICK = ((TOTAL_PACKETS - 1) / TOTAL_PACKETS) * AVG_SOJOURN_TICK + (i - q.get_nowait()) / TOTAL_PACKETS
         print("AVG_SOJOURN_TIME: ", AVG_SOJOURN_TICK)
 
       global AVG_NUM_PACKETS
@@ -100,7 +101,7 @@ def main(queue_type):
         # packet generation and inter-arrival time calculation
         if i == inter_arrival_tick:
           server_queue, service_tick = queue_fns('gen', server_queue, i, service_tick)
-          inter_arrival_tick = i + int(round(expon_var(lam) / TICK_DURATION, 0))
+          inter_arrival_tick = i + int(np.ceil(expon_var(lam) / TICK_DURATION))
           print("INTERARRIVAL:", inter_arrival_tick)
 
         # service packets
@@ -110,7 +111,6 @@ def main(queue_type):
         print("PACKETS IN QUEUE: ", server_queue.qsize())
 
       AVG_NUM_PACKETS /= TICKS
-      AVG_SOJOURN_TICK /= TOTAL_PACKETS
 
 
 # Network queue type and parameter selection
@@ -123,7 +123,10 @@ print("P_idle: ", IDLE_TICK)
 
 # Test Random Exponential Variable
 # mylist = []
+# lam = 0.2 * 10**6 / 2000
 # for i in range(1, 1000):
-#   mylist.append(expon_var(0.3))
+#   mylist.append(expon_var(lam) / 10**-3)
 
-# print(np.average(mylist))
+# print(mylist)
+# p.hist(mylist, 30)
+# p.show()
