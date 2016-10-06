@@ -4,7 +4,7 @@ from matplotlib import pyplot as p
 
 # set global variables (tick duration set to 1 ms)
 TICK_DURATION = 10**-3
-TICKS = 100000
+TICKS = 1000
 SERVICE_TIME = 0
 DASH = '---------------------------'
 AVG_NUM_PACKETS = 0
@@ -78,6 +78,8 @@ def main(queue_type):
   global AVG_SOJOURN_TICK
   global TOTAL_PACKETS
   SERVICE_TIME = int((float(L) / C) / TICK_DURATION)
+  output = [0, 0, 0]
+  final_result = []
 
   for rho in np.arange(lower, upper, step_size):
     print("RHO: ", rho)
@@ -111,22 +113,30 @@ def main(queue_type):
         print("PACKETS IN QUEUE: ", server_queue.qsize())
 
       AVG_NUM_PACKETS /= TICKS
+      output[0] += AVG_NUM_PACKETS
+      output[1] += AVG_SOJOURN_TICK
+      output[2] += IDLE_TICK / TICKS
+
+    output = [x / repetition for x in output]
+    final_result.append(output)
+
+  return final_result
 
 
 # Network queue type and parameter selection
-main(queue_type='md1')
+print(main(queue_type='md1'))
 
 print(DASH)
 print("E[n]: ", AVG_NUM_PACKETS)
 print("E[t]: ", AVG_SOJOURN_TICK)
-print("P_idle: ", IDLE_TICK)
+print("P_idle: ", IDLE_TICK / TICKS)
 
 # Test Random Exponential Variable
 # mylist = []
 # lam = 0.2 * 10**6 / 2000
-# for i in range(1, 1000):
-#   mylist.append(expon_var(lam) / 10**-3)
+# for i in range(1, 10000):
+#   mylist.append(expon_var(lam) / TICK_DURATION)
 
 # print(mylist)
-# p.hist(mylist, 30)
+# p.hist(mylist, 100)
 # p.show()

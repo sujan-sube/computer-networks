@@ -15,7 +15,7 @@ The objective of this project is to create a network queue simulatior. This will
   * `git clone https://github.com/sujan-sube/networks-queue-simulation.git`
   
 3. Install Conda Virutal Environment: 
-  * `cd networks-queue-simulation`
+  * `cd computer-networks`
   * `conda create --name network-simulator --file requirements.txt` 
   * (if you have trouble with this check out this [link](http://conda.pydata.org/docs/using/envs.html))
   
