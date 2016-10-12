@@ -4,7 +4,7 @@ from matplotlib import pyplot as p
 
 # set global variables (tick duration set to 1 ms)
 TICK_DURATION = 10**-3
-TICKS = 1000
+TICKS = 10000
 SERVICE_TIME = 0
 DASH = '---------------------------'
 AVG_NUM_PACKETS = 0
@@ -65,7 +65,7 @@ def main(queue_type):
 
   # declare variables for simulation
   server_queue = Queue()
-  repetition = 1
+  repetition = 5
   lower = 0.2
   upper = 0.3
   step_size = 0.1
@@ -94,6 +94,7 @@ def main(queue_type):
       AVG_NUM_PACKETS = 0
       AVG_SOJOURN_TICK = 0
       TOTAL_PACKETS = 0
+      server_queue = Queue()
 
       # network simulation loop
       for i in range(1, TICKS + 1, 1):
@@ -114,7 +115,7 @@ def main(queue_type):
 
       AVG_NUM_PACKETS /= TICKS
       output[0] += AVG_NUM_PACKETS
-      output[1] += AVG_SOJOURN_TICK
+      output[1] += AVG_SOJOURN_TICK * TICK_DURATION
       output[2] += IDLE_TICK / TICKS
 
     output = [x / repetition for x in output]
@@ -128,7 +129,7 @@ print(main(queue_type='md1'))
 
 print(DASH)
 print("E[n]: ", AVG_NUM_PACKETS)
-print("E[t]: ", AVG_SOJOURN_TICK)
+print("E[t]: ", AVG_SOJOURN_TICK * TICK_DURATION)
 print("P_idle: ", IDLE_TICK / TICKS)
 
 # Test Random Exponential Variable
