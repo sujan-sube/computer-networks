@@ -3,7 +3,7 @@ from asyncio import Queue
 from matplotlib import pyplot as plt
 
 # set global variables (tick duration set to 1 ms)
-TICK_DURATION = 10**-3
+TICK_DURATION = 10**-4
 TICKS = 10000
 SERVICE_TIME = 0
 DASH = '---------------------------'
@@ -11,6 +11,7 @@ AVG_NUM_PACKETS = 0
 AVG_SOJOURN_TICK = 0
 IDLE_TICK = 0
 TOTAL_PACKETS = 0
+VERBOSE = False
 
 
 # calculate exponential random variable
@@ -38,11 +39,15 @@ def md1(action, q, i, service_tick):
         # service_tick = i + SERVICE_TIME
         global AVG_SOJOURN_TICK
         AVG_SOJOURN_TICK = ((TOTAL_PACKETS - 1) / TOTAL_PACKETS) * AVG_SOJOURN_TICK + (i - q.get_nowait()) / TOTAL_PACKETS
-        print("AVG_SOJOURN_TIME: ", AVG_SOJOURN_TICK)
+
+        if VERBOSE:
+          print("AVG_SOJOURN_TIME: ", AVG_SOJOURN_TICK)
 
       global AVG_NUM_PACKETS
       AVG_NUM_PACKETS += q.qsize()
-      print("SERVICE TICK: ", service_tick)
+
+      if VERBOSE:
+        print("SERVICE TICK: ", service_tick)
 
     elif q.empty() is True:
       global IDLE_TICK
@@ -54,7 +59,7 @@ def md1(action, q, i, service_tick):
 def md1k(action, q, i, service_tick):
   pass
 
-def main(queue_type):
+def main(queue_type, rho_lower, rho_upper, reps):
   if queue_type == 'md1':
     queue_fns = md1
   elif queue_type == 'md1k':
@@ -65,9 +70,9 @@ def main(queue_type):
 
   # declare variables for simulation
   server_queue = Queue()
-  repetition = 1
-  lower = 0.2
-  upper = 1.0
+  repetition = reps
+  lower = rho_lower
+  upper = rho_upper
   step_size = 0.1
   C = 10**6
   L = 2000
@@ -104,19 +109,22 @@ def main(queue_type):
       # network simulation loop
       for i in range(1, TICKS + 1, 1):
         lam = rho * C / L
-        print("\nTICK: ", i)
+        if VERBOSE:
+          print("\nTICK: ", i)
 
         # packet generation and inter-arrival time calculation
         if i == inter_arrival_tick:
           server_queue, service_tick = queue_fns('gen', server_queue, i, service_tick)
           inter_arrival_tick = i + int(np.ceil(expon_var(lam) / TICK_DURATION))
-          print("INTERARRIVAL:", inter_arrival_tick)
+          if VERBOSE:
+            print("INTERARRIVAL:", inter_arrival_tick)
 
         # service packets
         server_queue, service_tick = queue_fns('service', server_queue, i, service_tick)
 
         # print packets in queue
-        print("PACKETS IN QUEUE: ", server_queue.qsize())
+        if VERBOSE:
+          print("PACKETS IN QUEUE: ", server_queue.qsize())
 
       AVG_NUM_PACKETS /= TICKS
       output[0] += AVG_NUM_PACKETS
@@ -131,7 +139,7 @@ def main(queue_type):
 
 if __name__ == '__main__':
   # Network queue type and parameter selection
-  rho, results = main(queue_type='md1')
+  rho, results = main(queue_type='md1', rho_lower=0.2, rho_upper=1.0, reps=1) 
 
   i = 0
   for result in results:
