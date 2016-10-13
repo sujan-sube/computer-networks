@@ -128,22 +128,23 @@ def main(queue_type):
   return final_result
 
 
-# Network queue type and parameter selection
-results = main(queue_type='md1')
+if __name__ == '__main__':
+  # Network queue type and parameter selection
+  results = main(queue_type='md1')
 
-for result in results:
-  print(DASH)
-  print("RHO: ", result[0])
-  print("E[n]: ", result[1][0])
-  print("E[t]: ", result[1][1])
-  print("P_idle: ", result[1][2])
+  for result in results:
+    print(DASH)
+    print("RHO: ", result[0])
+    print("E[n]: ", result[1][0])
+    print("E[t]: ", result[1][1])
+    print("P_idle: ", result[1][2])
 
-# Test Random Exponential Variable
-# mylist = []
-# lam = 0.2 * 10**6 / 2000
-# for i in range(1, 10000):
-#   mylist.append(expon_var(lam) / TICK_DURATION)
+  # Test Random Exponential Variable
+  # mylist = []
+  # lam = 0.2 * 10**6 / 2000
+  # for i in range(1, 10000):
+  #   mylist.append(expon_var(lam) / TICK_DURATION)
 
-# print(mylist)
-# p.hist(mylist, 100)
-# p.show()
+  # print(mylist)
+  # p.hist(mylist, 100)
+  # p.show()
