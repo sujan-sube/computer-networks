@@ -67,7 +67,7 @@ def main(queue_type):
   server_queue = Queue()
   repetition = 5
   lower = 0.2
-  upper = 0.3
+  upper = 1.0
   step_size = 0.1
   C = 10**6
   L = 2000
@@ -83,6 +83,10 @@ def main(queue_type):
 
   for rho in np.arange(lower, upper, step_size):
     print("RHO: ", rho)
+
+    # reset output variable for new rho
+    output = [0, 0, 0]
+
     for repeat in range(0, repetition, 1):
       print("REPETITION: ", repeat)
       print(DASH)
@@ -119,18 +123,20 @@ def main(queue_type):
       output[2] += IDLE_TICK / TICKS
 
     output = [x / repetition for x in output]
-    final_result.append(output)
+    final_result.append([rho, output])
 
   return final_result
 
 
 # Network queue type and parameter selection
-print(main(queue_type='md1'))
+results = main(queue_type='md1')
 
-print(DASH)
-print("E[n]: ", AVG_NUM_PACKETS)
-print("E[t]: ", AVG_SOJOURN_TICK * TICK_DURATION)
-print("P_idle: ", IDLE_TICK / TICKS)
+for result in results:
+  print(DASH)
+  print("RHO: ", result[0])
+  print("E[n]: ", result[1][0])
+  print("E[t]: ", result[1][1])
+  print("P_idle: ", result[1][2])
 
 # Test Random Exponential Variable
 # mylist = []
