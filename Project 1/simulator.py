@@ -1,6 +1,6 @@
 import numpy as np
 from asyncio import Queue
-from matplotlib import pyplot as p
+from matplotlib import pyplot as plt
 
 # set global variables (tick duration set to 1 ms)
 TICK_DURATION = 10**-3
@@ -65,7 +65,7 @@ def main(queue_type):
 
   # declare variables for simulation
   server_queue = Queue()
-  repetition = 5
+  repetition = 1
   lower = 0.2
   upper = 1.0
   step_size = 0.1
@@ -78,10 +78,11 @@ def main(queue_type):
   global AVG_SOJOURN_TICK
   global TOTAL_PACKETS
   SERVICE_TIME = int((float(L) / C) / TICK_DURATION)
+  rho_range = np.arange(lower, upper, step_size)
   output = [0, 0, 0]
   final_result = []
 
-  for rho in np.arange(lower, upper, step_size):
+  for rho in rho_range:
     print("RHO: ", rho)
 
     # reset output variable for new rho
@@ -123,21 +124,23 @@ def main(queue_type):
       output[2] += IDLE_TICK / TICKS
 
     output = [x / repetition for x in output]
-    final_result.append([rho, output])
+    final_result.append(output)
 
-  return final_result
+  return rho_range, final_result
 
 
 if __name__ == '__main__':
   # Network queue type and parameter selection
-  results = main(queue_type='md1')
+  rho, results = main(queue_type='md1')
 
+  i = 0
   for result in results:
     print(DASH)
-    print("RHO: ", result[0])
-    print("E[n]: ", result[1][0])
-    print("E[t]: ", result[1][1])
-    print("P_idle: ", result[1][2])
+    print("RHO: ", rho[i])
+    print("E[n]: ", result[0])
+    print("E[t]: ", result[1])
+    print("P_idle: ", result[2])
+    i += 1
 
   # Test Random Exponential Variable
   # mylist = []
@@ -146,5 +149,5 @@ if __name__ == '__main__':
   #   mylist.append(expon_var(lam) / TICK_DURATION)
 
   # print(mylist)
-  # p.hist(mylist, 100)
-  # p.show()
+  # plt.hist(mylist, 100)
+  # plt.show()
