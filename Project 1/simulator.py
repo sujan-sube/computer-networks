@@ -11,6 +11,8 @@ AVG_NUM_PACKETS = 0
 AVG_SOJOURN_TICK = 0
 IDLE_TICK = 0
 TOTAL_PACKETS = 0
+PACKET_LOSS = 0
+QUEUE_MAX = None
 VERBOSE = False
 
 
@@ -36,7 +38,6 @@ def md1(action, q, i, service_tick):
         service_tick = i + SERVICE_TIME
 
       if i == service_tick:
-        # service_tick = i + SERVICE_TIME
         global AVG_SOJOURN_TICK
         AVG_SOJOURN_TICK = ((TOTAL_PACKETS - 1) / TOTAL_PACKETS) * AVG_SOJOURN_TICK + (i - q.get_nowait()) / TOTAL_PACKETS
 
@@ -57,9 +58,43 @@ def md1(action, q, i, service_tick):
 
 # implementation of M/D/1/K queue
 def md1k(action, q, i, service_tick):
-  pass
 
-def main(queue_type, rho_lower, rho_upper, reps):
+  # handle generate packet request
+  if action == 'gen':
+    if q.qsize() < QUEUE_MAX:
+      q.put_nowait(i)
+      global TOTAL_PACKETS
+      TOTAL_PACKETS += 1
+    elif q.qsize() >= QUEUE_MAX:
+      global PACKET_LOSS
+      PACKET_LOSS += 1
+
+  # handle service packet request
+  elif action == 'service':
+    if q.empty() is False:
+      if i == 1 or service_tick < i:
+        service_tick = i + SERVICE_TIME
+
+      if i == service_tick:
+        global AVG_SOJOURN_TICK
+        AVG_SOJOURN_TICK = ((TOTAL_PACKETS - 1) / TOTAL_PACKETS) * AVG_SOJOURN_TICK + (i - q.get_nowait()) / TOTAL_PACKETS
+
+        if VERBOSE:
+          print("AVG_SOJOURN_TIME: ", AVG_SOJOURN_TICK)
+
+      global AVG_NUM_PACKETS
+      AVG_NUM_PACKETS += q.qsize()
+
+      if VERBOSE:
+        print("SERVICE TICK: ", service_tick)
+
+    elif q.empty() is True:
+      global IDLE_TICK
+      IDLE_TICK += 1
+
+  return q, service_tick
+
+def main(queue_type, rho_lower, rho_upper, reps, K=None):
   if queue_type == 'md1':
     queue_fns = md1
   elif queue_type == 'md1k':
@@ -76,22 +111,24 @@ def main(queue_type, rho_lower, rho_upper, reps):
   step_size = 0.1
   C = 10**6
   L = 2000
-  # K = None
   global SERVICE_TIME
   global IDLE_TICK
   global AVG_NUM_PACKETS
   global AVG_SOJOURN_TICK
   global TOTAL_PACKETS
+  global PACKET_LOSS
+  global QUEUE_MAX
+  QUEUE_MAX = K
   SERVICE_TIME = int((float(L) / C) / TICK_DURATION)
   rho_range = np.arange(lower, upper, step_size)
-  output = [0, 0, 0]
+  output = [0, 0, 0, 0]
   final_result = []
 
   for rho in rho_range:
     print("RHO: ", rho)
 
     # reset output variable for new rho
-    output = [0, 0, 0]
+    output = [0, 0, 0, 0]
 
     for repeat in range(0, repetition, 1):
       print("REPETITION: ", repeat)
@@ -104,6 +141,7 @@ def main(queue_type, rho_lower, rho_upper, reps):
       AVG_NUM_PACKETS = 0
       AVG_SOJOURN_TICK = 0
       TOTAL_PACKETS = 0
+      PACKET_LOSS = 0
       server_queue = Queue()
 
       # network simulation loop
@@ -130,16 +168,16 @@ def main(queue_type, rho_lower, rho_upper, reps):
       output[0] += AVG_NUM_PACKETS
       output[1] += AVG_SOJOURN_TICK * TICK_DURATION
       output[2] += IDLE_TICK / TICKS
+      output[3] += PACKET_LOSS / TOTAL_PACKETS
 
     output = [x / repetition for x in output]
     final_result.append(output)
-
   return rho_range, final_result
 
 
 if __name__ == '__main__':
   # Network queue type and parameter selection
-  rho, results = main(queue_type='md1', rho_lower=0.2, rho_upper=1.0, reps=1) 
+  rho, results = main(queue_type='md1k', rho_lower=0.5, rho_upper=1.6, reps=5, K=10) 
 
   i = 0
   for result in results:
@@ -148,6 +186,7 @@ if __name__ == '__main__':
     print("E[n]: ", result[0])
     print("E[t]: ", result[1])
     print("P_idle: ", result[2])
+    print("P_loss: ", result[3])
     i += 1
 
   # Test Random Exponential Variable
