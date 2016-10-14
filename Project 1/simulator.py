@@ -1,8 +1,7 @@
 import numpy as np
 from asyncio import Queue
-from matplotlib import pyplot as plt
 
-# set global variables (tick duration set to 1 ms)
+# set global variables (tick duration set to 100 microseconds)
 TICK_DURATION = 10**-4
 TICKS = 10000
 SERVICE_TIME = 0
@@ -188,13 +187,3 @@ if __name__ == '__main__':
     print("P_idle: ", result[2])
     print("P_loss: ", result[3])
     i += 1
-
-  # Test Random Exponential Variable
-  # mylist = []
-  # lam = 0.2 * 10**6 / 2000
-  # for i in range(1, 10000):
-  #   mylist.append(expon_var(lam) / TICK_DURATION)
-
-  # print(mylist)
-  # plt.hist(mylist, 100)
-  # plt.show()
