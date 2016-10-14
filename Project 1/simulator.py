@@ -1,8 +1,8 @@
 import numpy as np
 from asyncio import Queue
 
-# set global variables (tick duration set to 1 ms)
-TICK_DURATION = 10**-6
+# set global variables (tick duration set to 100 microseconds)
+TICK_DURATION = 10**-4
 TICKS = 10000
 SERVICE_TIME = 0
 DASH = '---------------------------'
