@@ -2,44 +2,49 @@ import simulator
 from matplotlib import pyplot as plt
 import numpy as np
 
-def main(queue_type, rho_lower, rho_upper, reps):
-  rho, result = simulator.main(queue_type, rho_lower, rho_upper, reps)
-  result = np.array(result)
-  x = rho
-  en = result[:, 0]
-  et = result[:, 1]
-  p_idle = result[:, 2]
+def main(queue_type, rho_lower, rho_upper, reps, K=None):
 
-  # verify output data
-  print("E[n]: ", en)
-  print("E[t]: ", et)
-  print("E[n]/E[t]: ", np.divide(en, et))
-  print("lamda: ", np.multiply(rho, 500))
+  if queue_type == 'md1':
+    rho, result = simulator.main(queue_type, rho_lower, rho_upper, reps)
+    result = np.array(result)
+    x = rho
+    en = result[:, 0]
+    et = result[:, 1]
+    p_idle = result[:, 2]
 
-  # Rho vs E[n] Plot
-  plt.figure(1)
-  plt.grid(True)
-  plt.title('Rho vs E[n] Plot')
-  plt.xlabel('Rho')
-  plt.ylabel('Time (s)')
-  plt.plot(x, en, 'ro-')
+    # verify output data
+    print("E[n]: ", en)
+    print("E[t]: ", et)
+    print("E[n]/E[t]: ", np.divide(en, et))
+    print("lamda: ", np.multiply(rho, 500))
 
-  # Rho vs E[t] Plot
-  plt.figure(2)
-  plt.grid(True)
-  plt.title('Rho vs E[t] Plot')
-  plt.xlabel('Rho')
-  plt.ylabel('Time (s)')
-  plt.plot(x, et, 'bo-')
+    # Rho vs E[n] Plot
+    plt.figure(1)
+    plt.grid(True)
+    plt.title('Rho vs E[n] Plot')
+    plt.xlabel('Rho')
+    plt.ylabel('Number of Packets')
+    plt.plot(x, en, 'ro-')
 
-  # Rho vs P_idle Plot
-  plt.figure(3)
-  plt.grid(True)
-  plt.title('Rho vs P_idle Plot')
-  plt.xlabel('Rho')
-  plt.ylabel('Percentage')
-  plt.plot(x, p_idle, 'go-')
-  plt.show()
+    # Rho vs E[t] Plot
+    plt.figure(2)
+    plt.grid(True)
+    plt.title('Rho vs E[t] Plot')
+    plt.xlabel('Rho')
+    plt.ylabel('Time (s)')
+    plt.plot(x, et, 'bo-')
+
+    # Rho vs P_idle Plot
+    plt.figure(3)
+    plt.grid(True)
+    plt.title('Rho vs P_idle Plot')
+    plt.xlabel('Rho')
+    plt.ylabel('Percentage')
+    plt.plot(x, p_idle, 'go-')
+    plt.show()
+
+  elif queue_type == 'md1k':
+    pass
 
 
 if __name__ == '__main__':
