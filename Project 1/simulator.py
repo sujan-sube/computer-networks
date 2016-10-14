@@ -3,7 +3,7 @@ from asyncio import Queue
 from matplotlib import pyplot as plt
 
 # set global variables (tick duration set to 1 ms)
-TICK_DURATION = 10**-4
+TICK_DURATION = 10**-6
 TICKS = 10000
 SERVICE_TIME = 0
 DASH = '---------------------------'
