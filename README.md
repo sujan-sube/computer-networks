@@ -1,6 +1,6 @@
 ### About this Project
 
-This repository was created for ECE 358 Computer Networks. There are a total of 3 projects in the folders Project 1, Projct 2 and Project 3.
+This repository was created for ECE 358 Computer Networks. There are a 2 projects in the folders Project 1 and Projct 2.
 
 #### Project 1:
 
